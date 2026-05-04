@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import {
   createGame,
+  getHistory,
   getStats,
   isAuthenticated,
   isGuest,
@@ -110,6 +111,57 @@ function GameOverModal({ status, targetWord, onPlayAgain }) {
   );
 }
 
+function HistoryModal({ open, items, loading, error, onClose }) {
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="modal history-modal" role="dialog" aria-modal="true">
+        <div className="history-modal-header">
+          <h2>History</h2>
+          <button className="history-close" type="button" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+
+        {loading && <div className="history-muted">Loading…</div>}
+        {!loading && error && <div className="history-error">{error}</div>}
+        {!loading && !error && items?.length === 0 && (
+          <div className="history-muted">No completed games yet.</div>
+        )}
+
+        {!loading && !error && items?.length > 0 && (
+          <div className="history-list">
+            {items.map((g) => (
+              <div className="history-row" key={g.game_id}>
+                <div className={`history-status history-status--${g.status}`}>
+                  {g.status === "won" ? "Won" : "Lost"}
+                </div>
+                <div className="history-word">{String(g.target_word).toUpperCase()}</div>
+                <div className="history-attempts">{g.attempts_used}/6</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function GamePage() {
   const navigate = useNavigate();
   const [gameId, setGameId] = useState(null);
@@ -123,6 +175,10 @@ function GamePage() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [stats, setStats] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
   if (!isAuthenticated()) return <Navigate to="/login" replace />;
 
@@ -134,6 +190,24 @@ function GamePage() {
   function showToast(msg) {
     setToast(msg);
     setTimeout(() => setToast(""), 1500);
+  }
+
+  async function openHistory() {
+    setShowHistoryModal(true);
+    setHistoryLoading(true);
+    setHistoryError("");
+    try {
+      const items = await getHistory(20);
+      setHistoryItems(items);
+    } catch (err) {
+      setHistoryError(err.message || "Failed to load history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  function closeHistory() {
+    setShowHistoryModal(false);
   }
 
   async function startGame() {
@@ -241,16 +315,21 @@ function GamePage() {
   return (
     <>
       <header className="header">
-        <div className="stat-group">
-          <div className={`stat ${stats?.current_streak > 0 ? "stat--accent" : ""}`}>
-            <span className="stat-value">{stats?.current_streak ?? "—"}</span>
-            <span className="stat-label">Streak</span>
+        <div className="header-left">
+          <div className="stat-group">
+            <div className={`stat ${stats?.current_streak > 0 ? "stat--accent" : ""}`}>
+              <span className="stat-value">{stats?.current_streak ?? "—"}</span>
+              <span className="stat-label">Streak</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat">
+              <span className="stat-value">{stats?.max_streak ?? "—"}</span>
+              <span className="stat-label">Best</span>
+            </div>
           </div>
-          <div className="stat-divider" />
-          <div className="stat">
-            <span className="stat-value">{stats?.max_streak ?? "—"}</span>
-            <span className="stat-label">Best</span>
-          </div>
+          <button className="header-btn" type="button" onClick={openHistory}>
+            History
+          </button>
         </div>
 
         <h1>
@@ -291,6 +370,13 @@ function GamePage() {
             onPlayAgain={startGame}
           />
         )}
+        <HistoryModal
+          open={showHistoryModal}
+          items={historyItems}
+          loading={historyLoading}
+          error={historyError}
+          onClose={closeHistory}
+        />
       </div>
     </>
   );

@@ -11,10 +11,13 @@
   gap: 8px;
 }
 
-.header > .stat-group {
+.header-left {
   grid-column: 1;
   justify-self: start;
   min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .header h1 {
@@ -430,6 +433,104 @@
 
 .modal-button:hover {
   opacity: 0.9;
+}
+
+.history-modal {
+  padding: 24px;
+  max-width: 420px;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.history-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.history-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.history-close {
+  background: transparent;
+  border: 1px solid #3a3a3c;
+  color: #818384;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-close:hover {
+  border-color: rgba(83, 141, 78, 0.4);
+  color: #fff;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  overflow: auto;
+  padding-right: 4px;
+  max-height: min(320px, 45vh);
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #2a2a2c;
+  background: rgba(26, 26, 27, 0.6);
+  border-radius: 12px;
+}
+
+.history-status {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.history-status--won {
+  color: #6aaa64;
+}
+
+.history-status--lost {
+  color: #e74c3c;
+}
+
+.history-word {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+
+.history-attempts {
+  color: #818384;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.history-muted {
+  color: #818384;
+  font-weight: 600;
+}
+
+.history-error {
+  color: #e74c3c;
+  font-weight: 700;
 }
 
 /* ── Auth Form ─────────────────────────────────────── */
