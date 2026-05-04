@@ -75,6 +75,18 @@ class GameRead(GameBase):
     target_word: str | None = None
 
 
+# ── History ────────────────────────────────────────────────────────────
+
+
+class GameHistoryItem(SQLModel):
+    game_id: int
+    status: GameStatus
+    created_at: datetime
+    completed_at: datetime | None
+    target_word: str
+    attempts_used: int
+
+
 # ── Guess ─────────────────────────────────────────────────────────────
 
 

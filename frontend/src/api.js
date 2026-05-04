@@ -91,3 +91,8 @@ export async function submitGuess(gameId, word) {
 export async function getStats() {
   return request("/users/me/stats");
 }
+
+export async function getHistory(limit = 20) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return request(`/users/me/history?${params.toString()}`);
+}
