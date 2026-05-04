@@ -614,6 +614,9 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 32px;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
 }
 
 .auth-form {
