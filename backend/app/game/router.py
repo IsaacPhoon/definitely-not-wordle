@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -95,10 +96,16 @@ async def submit_guess(
     if not is_valid_guess(word):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not a valid word")
 
-    existing = await session.exec(
-        select(Guess).where(Guess.game_id == game_id)
+    attempts_result = await session.exec(
+        select(func.count()).select_from(Guess).where(Guess.game_id == game_id)
     )
-    attempt_number = len(existing.all()) + 1
+    attempt_number = int(attempts_result.one()) + 1
+
+    if attempt_number > 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No attempts remaining",
+        )
 
     guess = await process_guess(game, word, attempt_number, session)
 
