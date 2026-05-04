@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from enum import StrEnum
 
+import sqlalchemy as sa
 from sqlmodel import Field, JSON, Column, Relationship, SQLModel
 
 
@@ -24,7 +25,10 @@ class User(UserBase, table=True):
     max_streak: int = 0
     games_played: int = 0
     games_won: int = 0
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        sa_column=Column(sa.DateTime(timezone=True)),
+        default_factory=lambda: datetime.now(timezone.utc),
+    )
     games: list["Game"] = Relationship(back_populates="user")
 
 
@@ -51,8 +55,14 @@ class Game(GameBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     target_word: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    completed_at: datetime | None = None
+    created_at: datetime = Field(
+        sa_column=Column(sa.DateTime(timezone=True)),
+        default_factory=lambda: datetime.now(timezone.utc),
+    )
+    completed_at: datetime | None = Field(
+        sa_column=Column(sa.DateTime(timezone=True), nullable=True),
+        default=None,
+    )
     user: User = Relationship(back_populates="games")
     guesses: list["Guess"] = Relationship(back_populates="game")
 
@@ -72,7 +82,10 @@ class Guess(SQLModel, table=True):
     word: str
     attempt_number: int
     result: list[str] = Field(sa_column=Column(JSON))
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(
+        sa_column=Column(sa.DateTime(timezone=True)),
+        default_factory=lambda: datetime.now(timezone.utc),
+    )
     game: Game = Relationship(back_populates="guesses")
 
 
