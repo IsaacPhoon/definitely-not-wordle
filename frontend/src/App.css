@@ -51,6 +51,21 @@
   gap: 8px;
 }
 
+@media (max-width: 520px) {
+  .header-left .stat-group,
+  .header-right .stat-group {
+    display: none;
+  }
+
+  .header-btn-stats {
+    display: flex !important;
+  }
+
+  .header {
+    padding: 8px;
+  }
+}
+
 /* ── Stat Cards ──────────────────────────────────────── */
 
 .stat-group {
@@ -144,6 +159,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.header-btn-icon {
+  width: 40px;
+  padding: 0;
+}
+
+.header-btn-stats {
+  display: none;
 }
 
 .header-btn:hover {
@@ -532,6 +556,41 @@
 .history-error {
   color: #e74c3c;
   font-weight: 700;
+}
+
+.stats-modal {
+  padding: 24px;
+  max-width: 420px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stats-card {
+  border: 1px solid #2a2a2c;
+  background: rgba(26, 26, 27, 0.6);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stats-value {
+  font-size: 20px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-label {
+  margin-top: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 800;
+  color: #818384;
 }
 
 /* ── Auth Form ─────────────────────────────────────── */

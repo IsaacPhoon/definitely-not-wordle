@@ -162,6 +162,63 @@ function HistoryModal({ open, items, loading, error, onClose }) {
   );
 }
 
+function StatsModal({ open, stats, onClose }) {
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const gamesPlayed = stats?.games_played ?? "—";
+  const gamesWon = stats?.games_won ?? 0;
+  const winPct =
+    stats && stats.games_played > 0
+      ? Math.round((gamesWon / stats.games_played) * 100)
+      : null;
+
+  return (
+    <div
+      className="modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="modal stats-modal" role="dialog" aria-modal="true">
+        <div className="history-modal-header">
+          <h2>Stats</h2>
+          <button className="history-close" type="button" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+
+        <div className="stats-grid">
+          <div className="stats-card">
+            <div className="stats-value">{stats?.current_streak ?? "—"}</div>
+            <div className="stats-label">Streak</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-value">{stats?.max_streak ?? "—"}</div>
+            <div className="stats-label">Best</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-value">{gamesPlayed}</div>
+            <div className="stats-label">Played</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-value">{winPct != null ? `${winPct}%` : "—"}</div>
+            <div className="stats-label">Win %</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function GamePage() {
   const navigate = useNavigate();
   const [gameId, setGameId] = useState(null);
@@ -179,6 +236,7 @@ function GamePage() {
   const [historyItems, setHistoryItems] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState("");
+  const [showStatsModal, setShowStatsModal] = useState(false);
 
   if (!isAuthenticated()) return <Navigate to="/login" replace />;
 
@@ -208,6 +266,14 @@ function GamePage() {
 
   function closeHistory() {
     setShowHistoryModal(false);
+  }
+
+  function openStats() {
+    setShowStatsModal(true);
+  }
+
+  function closeStats() {
+    setShowStatsModal(false);
   }
 
   async function startGame() {
@@ -330,6 +396,26 @@ function GamePage() {
           <button className="header-btn" type="button" onClick={openHistory}>
             History
           </button>
+          <button
+            className="header-btn header-btn-icon header-btn-stats"
+            type="button"
+            aria-label="Statistics"
+            onClick={openStats}
+          >
+            {/* simple bar-chart icon */}
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M4 19h16v2H2V3h2v16zm4-8h3v8H8v-8zm5-5h3v13h-3V6zm5 3h3v10h-3V9z"
+              />
+            </svg>
+          </button>
         </div>
 
         <h1>
@@ -377,6 +463,7 @@ function GamePage() {
           error={historyError}
           onClose={closeHistory}
         />
+        <StatsModal open={showStatsModal} stats={stats} onClose={closeStats} />
       </div>
     </>
   );
