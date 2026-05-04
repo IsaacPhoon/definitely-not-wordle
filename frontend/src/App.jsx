@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import {
   createGame,
+  getStats,
   isAuthenticated,
   isGuest,
   login,
@@ -121,8 +122,14 @@ function GamePage() {
   const [shake, setShake] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [stats, setStats] = useState(null);
 
   if (!isAuthenticated()) return <Navigate to="/login" replace />;
+
+  async function fetchStats() {
+    const data = await getStats();
+    setStats(data);
+  }
 
   function showToast(msg) {
     setToast(msg);
@@ -142,6 +149,7 @@ function GamePage() {
 
   useEffect(() => {
     startGame();
+    fetchStats();
   }, []);
 
   const handleKey = useCallback(
@@ -186,6 +194,7 @@ function GamePage() {
           if (newGame.status !== "in_progress") {
             setGameStatus(newGame.status);
             if (newGame.target_word) setTargetWord(newGame.target_word);
+            fetchStats();
             setTimeout(() => setShowModal(true), 1800);
           }
         } catch (err) {
@@ -228,10 +237,32 @@ function GamePage() {
   return (
     <>
       <header className="header">
+        <div className="header-left">
+          <div className="header-stat">
+            <span className="stat-value">{stats?.current_streak ?? "—"}</span>
+            <span className="stat-label">Streak</span>
+          </div>
+          <div className="header-stat">
+            <span className="stat-value">{stats?.max_streak ?? "—"}</span>
+            <span className="stat-label">Best</span>
+          </div>
+        </div>
         <h1>Definitely Not Wordle</h1>
-        <button className="header-btn" onClick={handleSignOut}>
-          {guest ? "Sign In" : "Sign Out"}
-        </button>
+        <div className="header-right">
+          <div className="header-stat">
+            <span className="stat-value">{stats?.games_played ?? "—"}</span>
+            <span className="stat-label">Played</span>
+          </div>
+          <div className="header-stat">
+            <span className="stat-value">
+              {stats ? `${stats.games_won}/${stats.games_played}` : "—"}
+            </span>
+            <span className="stat-label">W/P</span>
+          </div>
+          <button className="header-btn" onClick={handleSignOut}>
+            {guest ? "Sign In" : "Sign Out"}
+          </button>
+        </div>
       </header>
       <div className="game">
         <Toast message={toast} />
