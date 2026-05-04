@@ -99,6 +99,7 @@ export default function App() {
   const [toast, setToast] = useState("");
   const [shake, setShake] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   function showToast(msg) {
     setToast(msg);
@@ -113,6 +114,7 @@ export default function App() {
     setGameStatus("in_progress");
     setTargetWord(null);
     setLetterStates({});
+    setShowModal(false);
   }
 
   useEffect(() => {
@@ -161,9 +163,12 @@ export default function App() {
             return updated;
           });
 
-          setGameStatus(newGame.status);
-          if (newGame.target_word) {
-            setTargetWord(newGame.target_word);
+          if (newGame.status !== "in_progress") {
+            setGameStatus(newGame.status);
+            if (newGame.target_word) {
+              setTargetWord(newGame.target_word);
+            }
+            setTimeout(() => setShowModal(true), 1800);
           }
         } catch (err) {
           showToast(err.message);
@@ -205,13 +210,15 @@ export default function App() {
         <h1>Definitely Not Wordle</h1>
       </header>
       <Toast message={toast} />
-      <GameBoard guesses={guesses} currentGuess={currentGuess} shake={shake} />
+      <GameBoard key={gameId} guesses={guesses} currentGuess={currentGuess} shake={shake} />
       <Keyboard letterStates={letterStates} onKey={handleKey} />
-      <GameOverModal
-        status={gameStatus}
-        targetWord={targetWord}
-        onPlayAgain={startGame}
-      />
+      {showModal && (
+        <GameOverModal
+          status={gameStatus}
+          targetWord={targetWord}
+          onPlayAgain={startGame}
+        />
+      )}
     </div>
   );
 }

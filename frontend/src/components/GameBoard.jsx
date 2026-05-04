@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function Tile({ letter, color, position, revealed }) {
   const [animState, setAnimState] = useState("idle");
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!revealed) return;
+    if (!revealed || hasAnimated.current) return;
+    hasAnimated.current = true;
     const flipDelay = position * 300;
     const timer1 = setTimeout(() => setAnimState("flip-out"), flipDelay);
     const timer2 = setTimeout(() => setAnimState("flip-in"), flipDelay + 250);
