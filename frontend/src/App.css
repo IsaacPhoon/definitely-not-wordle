@@ -70,6 +70,7 @@
   padding: 5px 10px;
   border-radius: 10px;
   min-width: 40px;
+  min-height: 56px;
   transition: background-color 0.3s;
 }
 
@@ -641,7 +642,7 @@
   .header h1 { font-size: 20px; }
   .header-title-full { display: inline; }
   .header-title-short { display: none; }
-  .stat { padding: 6px 14px; min-width: 48px; }
+  .stat { padding: 6px 14px; min-width: 48px; min-height: 60px; }
   .stat-value { font-size: 20px; }
   .stat-label { font-size: 9px; }
   .stat-divider { height: 28px; }
@@ -660,7 +661,7 @@
     font-size: 12px;
   }
 
-  .stat { padding: 4px 8px; min-width: 36px; }
+  .stat { padding: 4px 8px; min-width: 36px; min-height: 52px; }
   .stat-value { font-size: 14px; }
   .header-btn { padding: 6px 10px; font-size: 9px; }
 }
