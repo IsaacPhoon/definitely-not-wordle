@@ -3,6 +3,7 @@ import {
   createGame,
   isAuthenticated,
   login,
+  loginAsGuest,
   register,
   submitGuess,
 } from "./api";
@@ -13,7 +14,7 @@ import "./App.css";
 const COLOR_PRIORITY = { green: 3, yellow: 2, gray: 1 };
 
 function AuthForm({ onAuth }) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
@@ -23,10 +24,20 @@ function AuthForm({ onAuth }) {
     setError("");
     try {
       if (isLogin) {
-        await login(email, password);
+        await login(username, password);
       } else {
-        await register(email, password);
+        await register(username, password);
       }
+      onAuth();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function handleGuest() {
+    setError("");
+    try {
+      await loginAsGuest();
       onAuth();
     } catch (err) {
       setError(err.message);
@@ -38,10 +49,10 @@ function AuthForm({ onAuth }) {
       <h1>Definitely Not Wordle</h1>
       <form className="auth-form" onSubmit={handleSubmit}>
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
         <input
@@ -60,6 +71,10 @@ function AuthForm({ onAuth }) {
           </span>
         </p>
       </form>
+      <div className="auth-divider">or</div>
+      <button className="guest-button" onClick={handleGuest}>
+        Play as Guest
+      </button>
     </div>
   );
 }

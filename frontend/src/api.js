@@ -1,15 +1,20 @@
 const BASE_URL = "http://localhost:8000";
 
 function getToken() {
-  return localStorage.getItem("token");
+  return localStorage.getItem("token") || sessionStorage.getItem("token");
 }
 
-function setToken(token) {
-  localStorage.setItem("token", token);
+function setToken(token, guest = false) {
+  if (guest) {
+    sessionStorage.setItem("token", token);
+  } else {
+    localStorage.setItem("token", token);
+  }
 }
 
 function clearToken() {
   localStorage.removeItem("token");
+  sessionStorage.removeItem("token");
 }
 
 async function request(path, options = {}) {
@@ -28,21 +33,27 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-export async function register(email, password) {
+export async function register(username, password) {
   const data = await request("/auth/register", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
   });
-  setToken(data.access_token);
+  setToken(data.access_token, false);
   return data;
 }
 
-export async function login(email, password) {
+export async function login(username, password) {
   const data = await request("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
   });
-  setToken(data.access_token);
+  setToken(data.access_token, false);
+  return data;
+}
+
+export async function loginAsGuest() {
+  const data = await request("/auth/guest", { method: "POST" });
+  setToken(data.access_token, true);
   return data;
 }
 

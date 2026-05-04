@@ -350,6 +350,33 @@
   font-weight: 700;
 }
 
+.auth-divider {
+  color: #3a3a3c;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 4px 0;
+}
+
+.guest-button {
+  width: 100%;
+  max-width: 300px;
+  padding: 14px;
+  border-radius: 4px;
+  border: 1px solid #3a3a3c;
+  background: transparent;
+  color: #818384;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.guest-button:hover {
+  border-color: #565758;
+  color: #fff;
+}
+
 /* ── Responsive ────────────────────────────────────── */
 
 @media (max-width: 400px) {

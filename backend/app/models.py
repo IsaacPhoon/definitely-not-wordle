@@ -15,12 +15,13 @@ class GameStatus(StrEnum):
 
 
 class UserBase(SQLModel):
-    email: str = Field(unique=True, index=True)
+    username: str = Field(unique=True, index=True)
 
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     password_hash: str
+    is_guest: bool = False
     current_streak: int = 0
     max_streak: int = 0
     games_played: int = 0
@@ -32,7 +33,8 @@ class User(UserBase, table=True):
     games: list["Game"] = Relationship(back_populates="user")
 
 
-class UserCreate(UserBase):
+class UserCreate(SQLModel):
+    username: str
     password: str
 
 
