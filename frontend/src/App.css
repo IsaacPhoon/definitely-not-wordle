@@ -18,6 +18,7 @@
   display: flex;
   align-items: stretch;
   gap: 8px;
+  overflow: hidden;
 }
 
 .header h1 {
@@ -29,6 +30,7 @@
   grid-column: 3;
   justify-self: end;
   min-width: 0;
+  overflow: hidden;
 }
 
 .header h1 {
@@ -40,6 +42,8 @@
   white-space: nowrap;
   color: rgba(255, 255, 255, 0.85);
   user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-title-full { display: none; }
@@ -697,7 +701,7 @@
 
 /* ── Responsive ────────────────────────────────────── */
 
-@media (min-width: 640px) {
+@media (min-width: 850px) {
   .header h1 { font-size: 20px; }
   .header-title-full { display: inline; }
   .header-title-short { display: none; }
