@@ -234,30 +234,46 @@ function GamePage() {
     navigate("/login");
   }
 
+  const winPct = stats && stats.games_played > 0
+    ? Math.round((stats.games_won / stats.games_played) * 100)
+    : null;
+
   return (
     <>
       <header className="header">
-        <div className="header-left">
-          <div className="header-stat">
+        <div className="stat-group">
+          <div className={`stat ${stats?.current_streak > 0 ? "stat--accent" : ""}`}>
             <span className="stat-value">{stats?.current_streak ?? "—"}</span>
             <span className="stat-label">Streak</span>
           </div>
-          <div className="header-stat">
+          <div className="stat-divider" />
+          <div className="stat">
             <span className="stat-value">{stats?.max_streak ?? "—"}</span>
             <span className="stat-label">Best</span>
           </div>
         </div>
-        <h1>Definitely Not Wordle</h1>
+
+        <h1>
+          <span className="header-title-full">Definitely Not Wordle</span>
+          <span className="header-title-short">DNW</span>
+        </h1>
+
         <div className="header-right">
-          <div className="header-stat">
-            <span className="stat-value">{stats?.games_played ?? "—"}</span>
-            <span className="stat-label">Played</span>
-          </div>
-          <div className="header-stat">
-            <span className="stat-value">
-              {stats ? `${stats.games_won}/${stats.games_played}` : "—"}
-            </span>
-            <span className="stat-label">W/P</span>
+          <div className="stat-group">
+            <div className="stat">
+              <span className="stat-value">{stats?.games_played ?? "—"}</span>
+              <span className="stat-label">Played</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat">
+              <span className="stat-value">{winPct != null ? `${winPct}%` : "—"}</span>
+              {winPct != null && (
+                <div className="win-bar">
+                  <div className="win-bar-fill" style={{ width: `${winPct}%` }} />
+                </div>
+              )}
+              <span className="stat-label">Win %</span>
+            </div>
           </div>
           <button className="header-btn" onClick={handleSignOut}>
             {guest ? "Sign In" : "Sign Out"}
