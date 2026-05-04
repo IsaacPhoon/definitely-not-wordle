@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import {
   createGame,
   isAuthenticated,
+  isGuest,
   login,
   loginAsGuest,
+  logout,
   register,
   submitGuess,
 } from "./api";
@@ -13,11 +16,14 @@ import "./App.css";
 
 const COLOR_PRIORITY = { green: 3, yellow: 2, gray: 1 };
 
-function AuthForm({ onAuth }) {
+function AuthPage() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
+
+  if (isAuthenticated()) return <Navigate to="/" replace />;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -28,7 +34,7 @@ function AuthForm({ onAuth }) {
       } else {
         await register(username, password);
       }
-      onAuth();
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
@@ -38,7 +44,7 @@ function AuthForm({ onAuth }) {
     setError("");
     try {
       await loginAsGuest();
-      onAuth();
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
@@ -103,8 +109,8 @@ function GameOverModal({ status, targetWord, onPlayAgain }) {
   );
 }
 
-export default function App() {
-  const [authed, setAuthed] = useState(isAuthenticated());
+function GamePage() {
+  const navigate = useNavigate();
   const [gameId, setGameId] = useState(null);
   const [guesses, setGuesses] = useState([]);
   const [currentGuess, setCurrentGuess] = useState("");
@@ -115,6 +121,8 @@ export default function App() {
   const [shake, setShake] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
 
   function showToast(msg) {
     setToast(msg);
@@ -133,8 +141,8 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (authed) startGame();
-  }, [authed]);
+    startGame();
+  }, []);
 
   const handleKey = useCallback(
     async (key) => {
@@ -168,10 +176,7 @@ export default function App() {
               const letter = newGuess.word[i];
               const color = newGuess.result[i];
               const existing = updated[letter];
-              if (
-                !existing ||
-                COLOR_PRIORITY[color] > COLOR_PRIORITY[existing]
-              ) {
+              if (!existing || COLOR_PRIORITY[color] > COLOR_PRIORITY[existing]) {
                 updated[letter] = color;
               }
             }
@@ -180,9 +185,7 @@ export default function App() {
 
           if (newGame.status !== "in_progress") {
             setGameStatus(newGame.status);
-            if (newGame.target_word) {
-              setTargetWord(newGame.target_word);
-            }
+            if (newGame.target_word) setTargetWord(newGame.target_word);
             setTimeout(() => setShowModal(true), 1800);
           }
         } catch (err) {
@@ -215,25 +218,42 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [handleKey]);
 
-  if (!authed) {
-    return <AuthForm onAuth={() => setAuthed(true)} />;
+  const guest = isGuest();
+
+  function handleSignOut() {
+    logout();
+    navigate("/login");
   }
 
   return (
-    <div className="game">
+    <>
       <header className="header">
         <h1>Definitely Not Wordle</h1>
+        <button className="header-btn" onClick={handleSignOut}>
+          {guest ? "Sign In" : "Sign Out"}
+        </button>
       </header>
-      <Toast message={toast} />
-      <GameBoard key={gameId} guesses={guesses} currentGuess={currentGuess} shake={shake} />
-      <Keyboard letterStates={letterStates} onKey={handleKey} />
-      {showModal && (
-        <GameOverModal
-          status={gameStatus}
-          targetWord={targetWord}
-          onPlayAgain={startGame}
-        />
-      )}
-    </div>
+      <div className="game">
+        <Toast message={toast} />
+        <GameBoard key={gameId} guesses={guesses} currentGuess={currentGuess} shake={shake} />
+        <Keyboard letterStates={letterStates} onKey={handleKey} />
+        {showModal && (
+          <GameOverModal
+            status={gameStatus}
+            targetWord={targetWord}
+            onPlayAgain={startGame}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/" element={<GamePage />} />
+    </Routes>
   );
 }

@@ -65,6 +65,10 @@ export function isAuthenticated() {
   return !!getToken();
 }
 
+export function isGuest() {
+  return !!sessionStorage.getItem("token") && !localStorage.getItem("token");
+}
+
 export async function createGame() {
   return request("/games", { method: "POST" });
 }
