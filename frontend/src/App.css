@@ -44,7 +44,7 @@
 
 .header-right {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
 }
 
@@ -132,11 +132,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  padding: 8px 12px;
+  padding: 0 12px;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header-btn:hover {
